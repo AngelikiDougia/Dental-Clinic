@@ -1,0 +1,177 @@
+body {
+    background-color: #50a3a2;
+}
+
+
+Header{
+  background-color: #614BC3;
+  padding: 10px 30px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+Header h1{
+  color: aliceblue;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: bold;
+  font-family: 'Dancing Script', cursive;
+}
+
+
+
+
+Header .logo{
+  font-size: 2em;
+}
+
+Header .nameTitle{
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.home-container
+{
+  display: flex;
+  width: 70%;
+  margin-left: 10%;
+}
+
+.child{
+  flex: 2;
+  
+  margin: 40px;
+  width: auto;
+}
+
+.child:first-child
+{
+  margin-right: 30%;
+}
+  
+
+footer {
+  position: absolute;
+  text-align: center;
+  bottom: 0;
+  width: 100%;
+  height: 2.5rem;
+}
+
+.quote{
+  
+  color: aliceblue;
+  padding: 40px 10px;
+  font-size: 3rem;
+  text-align: center;
+  font-family: 'Dancing Script', cursive;
+}  
+
+form {
+  padding: 20px 10px;
+  position: relative;
+  
+}
+
+.greeting{
+  padding: 40px 10px;
+  color: aliceblue;
+  text-align: center;
+}
+
+form input {
+  border: 1px solid rgba(252, 252, 252, 0.4);
+  background-color: rgba(252, 252, 252, 0.2);
+  width: 300px;
+  border-radius: 3px;
+  font-family: "Source Sans Pro", sans-serif;
+  padding: 10px 15px;
+  margin: 0 auto 10px auto;
+  display: block;
+  text-align: center;
+  font-size: 18px;
+  color: white;
+  font-weight: 300;
+}
+
+form button {
+  appearance: none;
+  outline: 0;
+  background-color: white;
+  border: 0;
+  padding: 10px 15px;
+  color: #50a3a2;
+  border-radius: 3px;
+  width: 300px;
+  font-size: 18px;
+  
+}
+
+button:hover{
+  background-color: black;
+}
+
+
+.sidebar {
+  top: 0px;
+  margin-top: 0px;
+  padding: 0.5rem 0 0 0;
+  width: 200px;
+  background-color: #614BC3;
+  position: fixed;
+  height: 100vh;
+  overflow: auto;
+}
+
+.sidebar a{
+  display: block;
+  color: black;
+  padding: 16px;
+  font-size: 19px;
+  text-decoration: none;
+}
+
+.sidebar .logo{
+  font-size: 3rem;
+}
+
+.sidebar .nameTitle{
+  font-size: 2.5rem;
+  font-weight: bold;
+  font-family: 'Dancing Script', cursive;
+  color: aliceblue;
+}
+
+ 
+.sidebar .active {
+  background-color: #614BC3;
+  color: white;
+}
+
+.sidebar a:hover:not(.active) {
+  background-color: #555;
+  color: white;
+}
+
+@media (max-width: 480px) {
+  .quote {
+    display: none; /* Hide left-div on mobile screens */
+  }
+
+  footer{
+    height: 1rem;
+  }
+}
+
+.centered-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  min-height: 100vh; /* Make it take up the full viewport height */
+}
+
+
+
+
+
+
+
