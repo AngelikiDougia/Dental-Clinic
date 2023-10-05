@@ -7,8 +7,8 @@ import Header from "../layouts/Header";
 
 function UpdatedPatientProfile(props)
 {
-    let { dentistId } = useParams(); 
-   
+    const { dentistId } = useParams(); 
+    console.log(dentistId);
     const navigate = useNavigate();
     const location = useLocation();
     const ssn = new URLSearchParams(location.search).get('ssn'); //console.log(ssn);
@@ -17,7 +17,7 @@ function UpdatedPatientProfile(props)
 
         name: "",
         surname: "", 
-        ssn: "",
+        ssn: ssn,
         birthdate: "",
         email: "",
         telephone: "",
@@ -26,7 +26,8 @@ function UpdatedPatientProfile(props)
         dentist_id: dentistId
     });
   
-
+    const [error, setError] = useState("");
+    let [existError, setExistError] = useState(false);
 
     useEffect(() => {
         loadPatient();
@@ -43,9 +44,18 @@ function UpdatedPatientProfile(props)
     };
 
     const handleSubmit  = async (event) => {
-        event.preventDefault();
-        await axios.put(`http://localhost:8080/patients/updatePatient/${ssn}?dentistId=${dentistId}`, patient);
-        navigate(`/dentistpage/${dentistId}`);
+        try{
+          event.preventDefault();
+          const response = await axios.put(`http://localhost:8080/patients/updatePatient/${ssn}?dentistId=${dentistId}`, patient);
+          navigate(`/dentistpage/${dentistId}`);
+        }catch(err){
+          if (err.response && err.response.data) {
+            console.log("Exception message:", err.response.data);
+            console.log(patient.ssn);
+            setError(err.response.data);
+            setExistError(true);
+          }
+        }
     };
     
     const handleCancel = async(event) =>{
@@ -61,6 +71,10 @@ function UpdatedPatientProfile(props)
 
       <form onSubmit={handleSubmit} >
 
+      {existError && (
+                  <p style={{color:"red", fontSize:"10px"}}>{error}</p>
+                  )}
+
         <label for="fname" style={{color:"black"}}>First name:</label><br/>
         <input type="text"  name="name" onChange= {handleChange} value={patient.name} style={{float:"left", paddingLeft:"15px", color:"black"}}/>
         <br/>   
@@ -68,11 +82,6 @@ function UpdatedPatientProfile(props)
         <br/>
         <label for="lname" style={{color:"black"}}>Last name:</label><br/>
         <input type="text"  name="surname" onChange= {handleChange} value={patient.surname} style={{float:"left", paddingLeft:"15px", color:"black"}}/>
-        <br/>   
-        <br/>
-        <br/>
-        <label for="ssn" style={{color:"black"}}>Social Security Number (SSN):</label><br/>
-        <input type="text"  name="ssn" onChange= {handleChange} value={patient.ssn} style={{float:"left", paddingLeft:"15px", color:"black"}}/>
         <br/>   
         <br/>
         <br/>

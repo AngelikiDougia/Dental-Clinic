@@ -72,7 +72,7 @@ function UpdatedAppointment(props)
         const updatedAppointment = { ...appointment };
         if(updatedAppointment.therapy==="Other"){ updatedAppointment.therapy =  therapy};
         try{
-        await axios.put(`http://localhost:8080/appointments/updateAppointment/${appointmentId}?dentistId=${dentistId}&ssn=${appointment.patient.ssn}`, appointment);
+        await axios.put(`http://localhost:8080/appointments/updateAppointment/${appointmentId}?dentistId=${dentistId}&ssn=${appointment.patient.ssn}`, updatedAppointment);
         navigate(`/dentistpage/${dentistId}/appointmentslist/`);
 
         }catch(err){
@@ -133,7 +133,7 @@ function UpdatedAppointment(props)
                 </select>
                 <br/>   
               {(description===true) ? (<div> <label for="Therapy" style={{color:"black"}}>Enter Treatment:</label><br/>
-              <input type="text" name="therapy" onChange= {(event)=>{setTherapy(event.target.value)}}  value={therapy} style={{float:"left", color:"black"}}/></div>) : null}
+              <input type="text" name="therapy" onChange= {handleChangeOther}  value={therapy} style={{float:"left", color:"black"}}/></div>) : null}
               <br/>   
               <br/>
               <br/>

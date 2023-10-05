@@ -25,7 +25,8 @@ function PatientForm()
       dentist_id: 0
     });
 
-    
+    const [error, setError] = useState("");
+    let [existError, setExistError] = useState(false);
 
     function handleChange(event)
     {
@@ -68,7 +69,13 @@ function PatientForm()
         navigate({pathname: `/dentistpage/${dentistId}/patientForm/resultForm`, search: `?${createSearchParams(queryParams)}`});
       }catch(err){
         console.log(err);
-        
+
+        if (err.response && err.response.data) {
+          console.log("Exception message:", err.response.data);
+          
+          setError(err.response.data);
+          setExistError(true);
+        }
       };
       
       
@@ -85,6 +92,10 @@ function PatientForm()
           <h2 style={{textAlign:"center", paddingLeft:"10px", color:"black"}}>New Patient Form</h2>
 
           <form onSubmit={handleLogin}>
+
+            {existError && (
+                  <p style={{color:"red", fontSize:"10px"}}>{error}</p>
+                  )}
 
             <label for="fname" style={{color:"black"}}>First name:</label><br/>
             <input type="text"  name="name" onChange= {handleChange} value={patient.name} style={{float:"left", paddingLeft:"15px", color:"black"}}/>
