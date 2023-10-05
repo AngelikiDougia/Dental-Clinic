@@ -204,7 +204,7 @@ public class PatientControllerTest
 
         String url = "/patients/updatePatient/12345";
         String inputInJson = objectMapper.writeValueAsString(mockPatient);
-        String expectedOutputInJson = objectMapper.writeValueAsString(mockNewPatient);
+        String expectedOutputInJson = "Resource saved successfully";
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .put(url)
                 .param("dentistId","3")

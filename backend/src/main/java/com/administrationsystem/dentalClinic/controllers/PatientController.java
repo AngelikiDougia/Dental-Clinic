@@ -1,6 +1,7 @@
 package com.administrationsystem.dentalClinic.controllers;
 
 
+import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
 import com.administrationsystem.dentalClinic.models.patient.Patient;
 
 
@@ -31,6 +32,10 @@ public class PatientController
 
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Resource saved successfully");
+        }  catch (ExistingPatientException e) {
+
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -72,14 +77,19 @@ public class PatientController
     }
 
     @PutMapping("/updatePatient/{ssn}")
-    public Patient updatePatient(@RequestBody Patient newPatient, @PathVariable String ssn,@RequestParam Long dentistId) {
+    public ResponseEntity<String> updatePatient(@RequestBody Patient newPatient, @PathVariable String ssn, @RequestParam Long dentistId) throws ExistingPatientException {
 
-        if(patientService.findBySsn(ssn)!=null){
-            patientService.deletePatient(ssn);
-            return patientService.updatePatient(newPatient, dentistId);
+        try {
+
+            patientService.updatePatient(newPatient,dentistId);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("Resource saved successfully");
+
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred");
         }
-
-        return null;
 
 
 

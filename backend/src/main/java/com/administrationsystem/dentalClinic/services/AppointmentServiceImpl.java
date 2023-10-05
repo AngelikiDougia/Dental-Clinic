@@ -1,6 +1,7 @@
 package com.administrationsystem.dentalClinic.services;
 
 import com.administrationsystem.dentalClinic.exceptions.AppointmentOverlapException;
+import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
 import com.administrationsystem.dentalClinic.models.appointment.*;
 import com.administrationsystem.dentalClinic.repositories.AppointmentRepository;
 import com.administrationsystem.dentalClinic.repositories.DentistRepository;
@@ -85,15 +86,17 @@ public class AppointmentServiceImpl implements AppointmentService
             // Check the validity of the appointment
             if (checkValidityOfAppointment(appointment, dentistId)) {
                 // If it's valid, set the dentist and patient and save the appointment
+                System.out.println("i get here 90");
                 appointment.setDentist(dentistRepository.findByDentistId(dentistId));
                 appointment.setPatient(patientRepository.findBySsn(ssn));
+
                 return appointmentRepository.save(appointment);
             }
         } catch (AppointmentOverlapException e) {
             // If an overlap exception is caught, rethrow it
             throw e;
         }
-        // You can handle other exceptions or return null or a default value here if needed
+
         return null;
     }
 
@@ -106,36 +109,21 @@ public class AppointmentServiceImpl implements AppointmentService
 
         String dateString = convertDateToStringDate(appointment.getDate());
 
-        if(findByDateAndTime(appointment.getDate(),appointment.getTime())!=null && appointmentRepository.existsById(appointment.getId())==false)
+        if(checkIfDentistHasScheduledAppointmentForThisTimeAndDate(appointment,dentistId))
         {
+
             throw new AppointmentOverlapException("Exists scheduled Appointment for this date and time in database");
+
         } else if (getAppointmentsByDate(dentistId, dateString )!=null) {
 
-            LocalTime appointment_time = convertStringTimeToLocalTime(appointment.getTime());
-            LocalTime appointment_timePlusDuration = appointment_time.plusMinutes(appointment.getDuration());
+            List<Appointment> appointments = getAppointmentsByDate(dentistId, dateString);
+            checkForAppointmentOverlaps(appointments, appointment);
 
-            for(Appointment scheduled_appointment : getAppointmentsByDate(dentistId,dateString)){
-                if(scheduled_appointment.getId()== appointment.getId()) continue;
-                LocalTime scheduled_appointment_time = convertStringTimeToLocalTime(scheduled_appointment.getTime());
-                if(scheduled_appointment_time.isBefore(appointment_time))
-                {
-                    LocalTime scheduled_appointment_endingTime = scheduled_appointment_time.plusMinutes(scheduled_appointment.getDuration());
-                    if(scheduled_appointment_endingTime.isAfter(appointment_time)) {
-                        throw new AppointmentOverlapException("Start time of the appointment isn't valid because the previous appointment will not have finished yet.");
-                    }
-
-                } else if (scheduled_appointment_time.isAfter(appointment_time)) {
-
-                    if(appointment_timePlusDuration.isAfter(scheduled_appointment_time))
-                    {
-                        throw new AppointmentOverlapException("Duration of the appointment isn't valid because the next scheduled appointment is earlier");
-                    }
-                }
-            }
         }
         return true;
     }
 
+    // Helper Functions
     public String convertDateToStringDate(Date date)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -148,5 +136,59 @@ public class AppointmentServiceImpl implements AppointmentService
 
         // Parse the input time string into a LocalTime object
         return  LocalTime.parse(timeInString, formatter);
+    }
+
+    public boolean checkIfDentistHasScheduledAppointmentForThisTimeAndDate(Appointment inputAppointment,Long dentistId) throws ParseException {
+        String date = convertDateToStringDate(inputAppointment.getDate());
+        List<Appointment> scheduledAppointments = getAppointmentsByDate(dentistId, date);
+        for(Appointment appointment: scheduledAppointments)
+        {
+
+            if(!appointment.getId().equals(inputAppointment.getId()))
+            {
+
+
+                if((appointment.getTime()).equals(inputAppointment.getTime()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void checkForAppointmentOverlaps(List<Appointment> appointments, Appointment appointment) throws AppointmentOverlapException {
+        LocalTime appointmentTime = convertStringTimeToLocalTime(appointment.getTime());
+        LocalTime appointmentTimePlusDuration = appointmentTime.plusMinutes(appointment.getDuration());
+
+        for (Appointment scheduledAppointment : appointments) {
+            if ((scheduledAppointment.getId()).equals(appointment.getId())) {
+                continue; // Skip the current appointment
+            }
+
+            LocalTime scheduledAppointmentTime = convertStringTimeToLocalTime(scheduledAppointment.getTime());
+
+            if (scheduledAppointmentTime.isBefore(appointmentTime)) {
+                checkIfPreviousAppointmentOverlaps(scheduledAppointment, appointmentTime);
+            } else if (scheduledAppointmentTime.isAfter(appointmentTime)) {
+                checkIfNextAppointmentOverlaps(scheduledAppointment, appointmentTimePlusDuration);
+            }
+        }
+    }
+
+    private void checkIfPreviousAppointmentOverlaps(Appointment scheduledAppointment, LocalTime appointmentTime) throws AppointmentOverlapException {
+        LocalTime scheduledAppointmentTime = convertStringTimeToLocalTime(scheduledAppointment.getTime());
+        LocalTime scheduledAppointmentEndingTime = scheduledAppointmentTime.plusMinutes(scheduledAppointment.getDuration());
+
+        if (scheduledAppointmentEndingTime.isAfter(appointmentTime)) {
+            throw new AppointmentOverlapException("Start time of the appointment isn't valid because the previous appointment will not have finished yet.");
+        }
+    }
+
+
+    private void checkIfNextAppointmentOverlaps(Appointment scheduledAppointment, LocalTime appointmentTimePlusDuration) throws AppointmentOverlapException {
+        if (appointmentTimePlusDuration.isAfter(convertStringTimeToLocalTime(scheduledAppointment.getTime()))) {
+            throw new AppointmentOverlapException("Duration of the appointment isn't valid because the next scheduled appointment is earlier");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.administrationsystem.dentalClinic.services;
 
+import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
 import com.administrationsystem.dentalClinic.models.patient.Patient;
 import com.administrationsystem.dentalClinic.models.patient.PatientManager;
 import com.administrationsystem.dentalClinic.repositories.DentistRepository;
@@ -30,8 +31,11 @@ public class PatientServiceImpl implements PatientService
         return patientRepository.save(patient);
     }
 
-    public Patient savePatient(Patient patient, Long dentist_id){
+    public Patient savePatient(Patient patient, Long dentist_id) throws ExistingPatientException {
 
+        if(existsBySsn(patient.getSsn())){
+            throw new ExistingPatientException();
+        }
         patient.setDentist(dentistRepository.findByDentistId(dentist_id));
         return savePatient(patient);
 
@@ -57,12 +61,15 @@ public class PatientServiceImpl implements PatientService
     }
 
     @Override
-    public Patient updatePatient(Patient patientData, Long dentist_id) {
+    public Patient updatePatient(Patient patientData, Long dentist_id) throws ExistingPatientException {
 
         patientManager = PatientManager.getInstance();
         Patient updatedPatient = patientManager.updatePatient(patientData);
+        deletePatient(patientData.getSsn());
         return savePatient(updatedPatient,dentist_id);
     }
+
+
 
     @Override
     public boolean existsBySsn(String ssnToCheck) {

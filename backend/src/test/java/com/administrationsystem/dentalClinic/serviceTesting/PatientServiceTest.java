@@ -1,6 +1,7 @@
 package com.administrationsystem.dentalClinic.serviceTesting;
 
 
+import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
 import com.administrationsystem.dentalClinic.models.dentist.Dentist;
 import com.administrationsystem.dentalClinic.models.patient.Patient;
 import com.administrationsystem.dentalClinic.models.patient.PatientManager;
@@ -65,8 +66,7 @@ public class PatientServiceTest{
 
     @DisplayName("JUnit test for savePatient with parameter DentistId in PatientService")
     @Test
-    public void PatientService_SavePatientWithDentistId_thenReturnPatientCorrectObject()
-    {
+    public void PatientService_SavePatientWithDentistId_thenReturnPatientCorrectObject() throws ExistingPatientException {
         //Arrange
         Patient expectedPatient = new Patient();
         expectedPatient.setSsn("3456789");

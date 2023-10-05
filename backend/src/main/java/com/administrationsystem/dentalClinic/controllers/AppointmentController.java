@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequestMapping("/appointments")
-public abstract class AppointmentController implements AppointmentService {
+public class AppointmentController{
 
 
 
@@ -33,7 +33,7 @@ public abstract class AppointmentController implements AppointmentService {
     public List<Appointment> getAllAppointments(@PathVariable("dentist_id") Long dentist_id)
     {
 
-        System.out.println("I get the Appointments line 30");
+
         return appointmentService.getAllAppointments(dentist_id);
     }
 
