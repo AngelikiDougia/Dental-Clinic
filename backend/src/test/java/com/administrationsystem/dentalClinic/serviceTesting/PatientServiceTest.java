@@ -2,9 +2,11 @@ package com.administrationsystem.dentalClinic.serviceTesting;
 
 
 import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
+import com.administrationsystem.dentalClinic.models.appointment.Appointment;
 import com.administrationsystem.dentalClinic.models.dentist.Dentist;
 import com.administrationsystem.dentalClinic.models.patient.Patient;
 import com.administrationsystem.dentalClinic.models.patient.PatientManager;
+import com.administrationsystem.dentalClinic.repositories.AppointmentRepository;
 import com.administrationsystem.dentalClinic.repositories.DentistRepository;
 import com.administrationsystem.dentalClinic.repositories.PatientRepository;
 import com.administrationsystem.dentalClinic.services.PatientServiceImpl;
@@ -33,6 +35,9 @@ public class PatientServiceTest{
 
     @Mock
     private DentistRepository dentistRepository;
+
+    @Mock
+    AppointmentRepository appointmentRepository;
 
     @Mock
     private PatientManager patientManager;
@@ -94,8 +99,22 @@ public class PatientServiceTest{
     public void PatientService_deletePatient_ReturnsNothing(){
         // Arrange
         String ssn = "987654321";
+        Patient patient = new Patient();
+        Dentist dentist = new Dentist();
+        patient.setDentist(dentist);
+        dentist.setDentistId(1L);
+        when(patientRepository.findBySsn(ssn)).thenReturn(patient);
+        List<Appointment> expectedAppointments = new ArrayList<>();
+
+        for(int i=0; i<4; i++)
+        {
+            Appointment appointment = new Appointment();
+            appointment.setPatient(patient);
+            expectedAppointments.add(appointment);
+        }
 
         when(patientRepository.existsBySsn(ssn)).thenReturn(true);
+        when(appointmentRepository.getAppointmentsByPatient_Ssn(ssn)).thenReturn(expectedAppointments);
         willDoNothing().given(patientRepository).deleteBySsn(ssn);
 
         //Act

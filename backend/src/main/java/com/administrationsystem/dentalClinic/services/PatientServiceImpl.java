@@ -1,8 +1,10 @@
 package com.administrationsystem.dentalClinic.services;
 
 import com.administrationsystem.dentalClinic.exceptions.ExistingPatientException;
+import com.administrationsystem.dentalClinic.models.appointment.Appointment;
 import com.administrationsystem.dentalClinic.models.patient.Patient;
 import com.administrationsystem.dentalClinic.models.patient.PatientManager;
+import com.administrationsystem.dentalClinic.repositories.AppointmentRepository;
 import com.administrationsystem.dentalClinic.repositories.DentistRepository;
 import com.administrationsystem.dentalClinic.repositories.PatientRepository;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,8 @@ public class PatientServiceImpl implements PatientService
     @Autowired
     private DentistRepository dentistRepository;
 
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     private PatientManager patientManager;
 
@@ -43,6 +47,12 @@ public class PatientServiceImpl implements PatientService
 
     public String deletePatient(String ssn){
 
+        Long dentistId = patientRepository.findBySsn(ssn).getDentist().getDentistId();
+        List<Appointment> appointments = appointmentRepository.getAppointmentsByPatient_Ssn(ssn);
+        appointments.forEach(appointment -> appointment.setPatient(null));
+        for(Appointment appointment: appointments){
+            appointmentRepository.save(appointment);
+        }
         if(!patientRepository.existsBySsn(ssn)){
             return "something went wrong";
         }
