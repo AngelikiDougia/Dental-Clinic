@@ -106,7 +106,7 @@ const App = createBrowserRouter([
   
   {
     path: "/adminpage",
-    element: localStorage.getItem("loggedIn")==="true" ? <DentistList/>: <Home/>
+    element: <DentistList/>
   }
   
   ,
